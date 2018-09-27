@@ -1,0 +1,36 @@
+{
+  "engineVersion": "5.2.9",
+  "compilerVersion": "5.2.9",
+  "template": {},
+  "target": {
+    "current": "web"
+  },
+  "modules": [
+    {
+      "name": "egret"
+    },
+    {
+      "name": "eui"
+    },
+    {
+      "name": "assetsmanager"
+    },
+    {
+      "name": "tween"
+    },
+    {
+      "name": "promise"
+    }
+  ],
+  "targets": {
+    "ios": {
+      "appname": "FlappyBird",
+      "packagename": "com.companyname",
+      "hybrid": false
+    },
+    "android": {
+      "appname": "FlappyBird",
+      "packagename": "com.companyname"
+    }
+  }
+}
