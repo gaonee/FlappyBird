@@ -1,3 +1,6 @@
+enum State {
+    normal,
+};
 class FlyControl {
     private mainObj: egret.DisplayObjectContainer;
 
@@ -8,6 +11,8 @@ class FlyControl {
     private index: number = 0;
 
     private bird: egret.Bitmap = null;
+    // 开始按钮
+    private startBtn: egret.Bitmap = null;
     // 当前高度
     private currentHeight: number = -1;
     // 坠落加速度
@@ -28,6 +33,7 @@ class FlyControl {
     // 状态：0,normal; 1,failure
     public readonly STATE_NORMAL: number = 0;
     public readonly STATE_FAILURE: number = 1;
+    public readonly STATE_STOP: number = 3;
     private state: number = this.STATE_NORMAL;
 
     public constructor(mainObjContainer: egret.DisplayObjectContainer, options) {
@@ -36,10 +42,14 @@ class FlyControl {
         this.mainObj = mainObjContainer;
         this.groundHeight = options.groundHeight || mainObjContainer.stage.stageHeight * 0.75;
 
-        let pipeLine1 = new PipeLine(mainObjContainer, {
+        this.initPipeLines();
+    }
+
+    private initPipeLines() {
+        let pipeLine1 = new PipeLine(this.mainObj, {
             groundPos: this.groundHeight
         });
-        let pipeLine2 = new PipeLine(mainObjContainer, {
+        let pipeLine2 = new PipeLine(this.mainObj, {
             groundPos: this.groundHeight,
             xPos: this.mainObj.stage.stageWidth
         });
@@ -125,9 +135,57 @@ class FlyControl {
     }
 
     /**
+     * 游戏状态重置
+     */
+    private reset() {
+        this.index = 0;
+        // 删除重新开始按钮
+        this.mainObj.removeChild(this.startBtn);
+        this.startBtn = null;
+        // 清空管道
+        for (let index in this.pipelineList) {
+            this.pipelineList[index].remove();
+        }
+        this.pipelineList = [];
+        this.initPipeLines();
+        // 状态设置为normal
+        this.state = this.STATE_NORMAL;
+        this.currentHeight = this.mainObj.stage.stageHeight/2 - this.bird.height/2;
+        // 重置飞行高度参照
+        this.flyReference = {
+            y: 0
+        };
+        // 初始化动画间隔时间
+        this.initInterval();
+    }
+
+    /**
+     * 游戏失败处理
+     */
+    private doFailure() {
+        // 
+        if (this.startBtn == null) {
+            let btn = new eui.Button();
+
+            let result = new egret.Bitmap();
+            let texture: egret.Texture = RES.getRes("btn_start_normal_png");
+            result.texture = texture;
+            result.x = (this.mainObj.stage.stageWidth - result.width) / 2;
+            result.y = this.mainObj.stage.stageHeight / 3 * 2;
+            result.touchEnabled = true;
+            this.mainObj.addChild(result);
+            result.addEventListener(egret.TouchEvent.TOUCH_TAP, () => {
+                result.texture = RES.getRes("btn_start_focus_png");
+                this.reset();
+            }, this);
+            this.startBtn = result;
+        }
+    }
+
+    /**
      * 飞起来
      */
-    public flyingUp() {
+    private flyingUp() {
         if (this.state !== this.STATE_NORMAL) {
             return;
         }
@@ -150,9 +208,24 @@ class FlyControl {
         });
     }
 
+    public start(): void {
+        this.flyingUp();
+    }
+
     public showFrame(): void {
-        if (this.state !== this.STATE_NORMAL) {
-            return;
+        switch(this.state) {
+            case this.STATE_FAILURE: {
+                this.doFailure();
+                // 失败之后进入终止状态，此状态下不执行任何操作。
+                this.state = this.STATE_STOP;
+                return;
+            }
+            case this.STATE_STOP: {
+                return;
+            }
+            default: {
+                break;
+            }
         }
 
         if (this.hitCheck()) {

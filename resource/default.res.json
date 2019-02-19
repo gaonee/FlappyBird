@@ -5,7 +5,7 @@
 			"name": "preload"
 		},
 		{
-			"keys": "bg_game_png,bg_ground_png,birds1_png,birds2_png,birds3_png,pipeline1_png,pipeline2_png",
+			"keys": "bg_game_png,bg_ground_png,birds1_png,birds2_png,birds3_png,pipeline1_png,pipeline2_png,btn_start_normal_png,btn_start_focus_png",
 			"name": "play"
 		}
 	],
@@ -179,6 +179,16 @@
 			"url": "assets/FlappyBird/pipeline2.png",
 			"type": "image",
 			"name": "pipeline2_png"
+		},
+		{
+			"url": "assets/FlappyBird/btn_start_focus.png",
+			"type": "image",
+			"name": "btn_start_focus_png"
+		},
+		{
+			"url": "assets/FlappyBird/btn_start_normal.png",
+			"type": "image",
+			"name": "btn_start_normal_png"
 		}
 	]
 }

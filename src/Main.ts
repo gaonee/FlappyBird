@@ -68,8 +68,6 @@ class Main extends eui.UILayer {
         const result = await RES.getResAsync("description_json")
         await platform.login();
         const userInfo = await platform.getUserInfo();
-        console.log(userInfo);
-
     }
 
     private async loadResource() {
@@ -105,7 +103,7 @@ class Main extends eui.UILayer {
      */
     protected createGameScene(): void {
         this.setBgImg("bg_png");
-        this.bgBitmap.addEventListener(egret.TouchEvent.TOUCH_END, this.onPlay, this);
+        this.bgBitmap.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onPlay, this);
     }
     /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
@@ -129,6 +127,8 @@ class Main extends eui.UILayer {
             console.error(e);
         }
 
+        this.bgBitmap.addEventListener(egret.TouchEvent.TOUCH_CANCEL, () => {}, this);
+
         this.setBgImg("bg_game_png");
 
         let bgGround = this.createBitmapByName("bg_ground_png");
@@ -143,9 +143,10 @@ class Main extends eui.UILayer {
                 this.flyController.showFrame();
             }
         }, this);
-        this.addEventListener(egret.TouchEvent.TOUCH_END, () => {
+        //可以考虑集成到FlyControl中
+        this.bgBitmap.addEventListener(egret.TouchEvent.TOUCH_TAP, (e) => {
             if (this.flyController) {
-                this.flyController.flyingUp();
+                this.flyController.start();
             }
         }, this);
 
